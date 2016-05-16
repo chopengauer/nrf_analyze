@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Nrf
-# Generated: Sun May 15 18:38:20 2016
+# Generated: Mon May 16 08:47:04 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -208,7 +208,7 @@ class nrf(grc_wxgui.top_block_gui):
         )
         self.Add(_ch_sizer)
         self.blocks_multiply_xx_0 = blocks.multiply_vcc(1)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, "/home/art/nrf/13M_2402_crc8_bin", False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, "tmp.raw", False)
         self.blocks_file_sink_0.set_unbuffered(False)
         self.blocks_add_const_vxx_0 = blocks.add_const_vff((freq_offset, ))
         self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, -1000000, 1, 0)

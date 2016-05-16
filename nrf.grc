@@ -800,7 +800,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/art/nrf/13M_2402_crc8_bin</value>
+      <value>tmp.raw</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -851,7 +851,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/art/nrf/fifo</value>
+      <value>fifo</value>
     </param>
     <param>
       <key>_coordinate</key>
