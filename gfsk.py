@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Nrf
-# Generated: Mon May 30 18:44:22 2016
+# Title: Gfsk
+# Generated: Tue May 31 13:40:43 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -16,41 +16,34 @@ if __name__ == '__main__':
         except:
             print "Warning: failed to XInitThreads()"
 
-from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
-from gnuradio import filter
 from gnuradio import gr
-from gnuradio import wxgui
 from gnuradio.eng_option import eng_option
-from gnuradio.fft import window
 from gnuradio.filter import firdes
-from gnuradio.wxgui import fftsink2
 from gnuradio.wxgui import forms
 from grc_gnuradio import wxgui as grc_wxgui
 from optparse import OptionParser
-import math
 import osmosdr
 import time
 import wx
 
 
-class nrf(grc_wxgui.top_block_gui):
+class gfsk(grc_wxgui.top_block_gui):
 
     def __init__(self):
-        grc_wxgui.top_block_gui.__init__(self, title="Nrf")
+        grc_wxgui.top_block_gui.__init__(self, title="Gfsk")
 
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 4000000
+        self.samp_rate = samp_rate = 1000000
         self.ch = ch = 25
         self.rf_gain = rf_gain = 0
         self.if_gain = if_gain = 20
         self.fsk_deviation_hz = fsk_deviation_hz = 170000
-        self.freq_offset = freq_offset = -0
-        self.fc = fc = 2399000000+ch*1000000
+        self.fc = fc = 2400000000+ch*1000000
         self.bw = bw = samp_rate
         self.bitrate = bitrate = 250000
         self.bb_gain = bb_gain = 30
@@ -104,29 +97,6 @@ class nrf(grc_wxgui.top_block_gui):
         	proportion=1,
         )
         self.Add(_if_gain_sizer)
-        _freq_offset_sizer = wx.BoxSizer(wx.VERTICAL)
-        self._freq_offset_text_box = forms.text_box(
-        	parent=self.GetWin(),
-        	sizer=_freq_offset_sizer,
-        	value=self.freq_offset,
-        	callback=self.set_freq_offset,
-        	label='freq_offset',
-        	converter=forms.float_converter(),
-        	proportion=0,
-        )
-        self._freq_offset_slider = forms.slider(
-        	parent=self.GetWin(),
-        	sizer=_freq_offset_sizer,
-        	value=self.freq_offset,
-        	callback=self.set_freq_offset,
-        	minimum=-1,
-        	maximum=1,
-        	num_steps=200,
-        	style=wx.SL_HORIZONTAL,
-        	cast=float,
-        	proportion=1,
-        )
-        self.Add(_freq_offset_sizer)
         _bb_gain_sizer = wx.BoxSizer(wx.VERTICAL)
         self._bb_gain_text_box = forms.text_box(
         	parent=self.GetWin(),
@@ -150,40 +120,23 @@ class nrf(grc_wxgui.top_block_gui):
         	proportion=1,
         )
         self.Add(_bb_gain_sizer)
-        self.wxgui_fftsink2_0 = fftsink2.fft_sink_c(
-        	self.GetWin(),
-        	baseband_freq=0,
-        	y_per_div=10,
-        	y_divs=10,
-        	ref_level=0,
-        	ref_scale=2.0,
-        	sample_rate=samp_rate,
-        	fft_size=1024,
-        	fft_rate=15,
-        	average=False,
-        	avg_alpha=None,
-        	title="FFT Plot",
-        	peak_hold=True,
-        )
-        self.Add(self.wxgui_fftsink2_0.win)
-        self.osmosdr_source_0_0 = osmosdr.source( args="numchan=" + str(1) + " " + "" )
-        self.osmosdr_source_0_0.set_sample_rate(samp_rate)
-        self.osmosdr_source_0_0.set_center_freq(fc, 0)
-        self.osmosdr_source_0_0.set_freq_corr(0, 0)
-        self.osmosdr_source_0_0.set_dc_offset_mode(0, 0)
-        self.osmosdr_source_0_0.set_iq_balance_mode(0, 0)
-        self.osmosdr_source_0_0.set_gain_mode(True, 0)
-        self.osmosdr_source_0_0.set_gain(rf_gain, 0)
-        self.osmosdr_source_0_0.set_if_gain(if_gain, 0)
-        self.osmosdr_source_0_0.set_bb_gain(bb_gain, 0)
-        self.osmosdr_source_0_0.set_antenna("", 0)
-        self.osmosdr_source_0_0.set_bandwidth(samp_rate, 0)
+        self.osmosdr_sink_0 = osmosdr.sink( args="numchan=" + str(1) + " " + "" )
+        self.osmosdr_sink_0.set_sample_rate(samp_rate)
+        self.osmosdr_sink_0.set_center_freq(fc, 0)
+        self.osmosdr_sink_0.set_freq_corr(0, 0)
+        self.osmosdr_sink_0.set_gain(rf_gain, 0)
+        self.osmosdr_sink_0.set_if_gain(if_gain, 0)
+        self.osmosdr_sink_0.set_bb_gain(bb_gain, 0)
+        self.osmosdr_sink_0.set_antenna("", 0)
+        self.osmosdr_sink_0.set_bandwidth(samp_rate, 0)
           
-        self.low_pass_filter_0_0 = filter.fir_filter_fff(samp_rate/bitrate, firdes.low_pass(
-        	1, samp_rate, bitrate, bitrate/2, firdes.WIN_HAMMING, 6.76))
-        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(
-        	1, samp_rate, 2000000, 1000000, firdes.WIN_HAMMING, 6.76))
-        self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
+        self.digital_gfsk_mod_0 = digital.gfsk_mod(
+        	samples_per_symbol=samp_rate/bitrate,
+        	sensitivity=0.5,
+        	bt=0.5,
+        	verbose=False,
+        	log=False,
+        )
         _ch_sizer = wx.BoxSizer(wx.VERTICAL)
         self._ch_text_box = forms.text_box(
         	parent=self.GetWin(),
@@ -207,45 +160,31 @@ class nrf(grc_wxgui.top_block_gui):
         	proportion=1,
         )
         self.Add(_ch_sizer)
-        self.blocks_multiply_xx_0 = blocks.multiply_vcc(1)
-        self.blocks_file_sink_0_0 = blocks.file_sink(gr.sizeof_char*1, "/opt/nrf_analyzer/fifo", False)
-        self.blocks_file_sink_0_0.set_unbuffered(False)
-        self.blocks_add_const_vxx_0 = blocks.add_const_vff((freq_offset, ))
-        self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, -1000000, 1, 0)
-        self.analog_quadrature_demod_cf_0 = analog.quadrature_demod_cf(1)
+        self.blocks_vector_source_x_1 = blocks.vector_source_b([0x00, 0xaa, 0xa2, 0x00, 0x09, 0x89, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x95, 0x7f, 0x1e], True, 1, [])
+        (self.blocks_vector_source_x_1).set_min_output_buffer(20)
+        (self.blocks_vector_source_x_1).set_max_output_buffer(20)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_quadrature_demod_cf_0, 0), (self.low_pass_filter_0_0, 0))    
-        self.connect((self.analog_sig_source_x_0, 0), (self.blocks_multiply_xx_0, 1))    
-        self.connect((self.blocks_add_const_vxx_0, 0), (self.digital_binary_slicer_fb_0, 0))    
-        self.connect((self.blocks_multiply_xx_0, 0), (self.low_pass_filter_0, 0))    
-        self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_file_sink_0_0, 0))    
-        self.connect((self.low_pass_filter_0, 0), (self.analog_quadrature_demod_cf_0, 0))    
-        self.connect((self.low_pass_filter_0, 0), (self.wxgui_fftsink2_0, 0))    
-        self.connect((self.low_pass_filter_0_0, 0), (self.blocks_add_const_vxx_0, 0))    
-        self.connect((self.osmosdr_source_0_0, 0), (self.blocks_multiply_xx_0, 0))    
+        self.connect((self.blocks_vector_source_x_1, 0), (self.digital_gfsk_mod_0, 0))    
+        self.connect((self.digital_gfsk_mod_0, 0), (self.osmosdr_sink_0, 0))    
 
     def get_samp_rate(self):
         return self.samp_rate
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.wxgui_fftsink2_0.set_sample_rate(self.samp_rate)
-        self.osmosdr_source_0_0.set_sample_rate(self.samp_rate)
-        self.osmosdr_source_0_0.set_bandwidth(self.samp_rate, 0)
-        self.low_pass_filter_0_0.set_taps(firdes.low_pass(1, self.samp_rate, self.bitrate, self.bitrate/2, firdes.WIN_HAMMING, 6.76))
-        self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 2000000, 1000000, firdes.WIN_HAMMING, 6.76))
+        self.osmosdr_sink_0.set_sample_rate(self.samp_rate)
+        self.osmosdr_sink_0.set_bandwidth(self.samp_rate, 0)
         self.set_bw(self.samp_rate)
-        self.analog_sig_source_x_0.set_sampling_freq(self.samp_rate)
 
     def get_ch(self):
         return self.ch
 
     def set_ch(self, ch):
         self.ch = ch
-        self.set_fc(2399000000+self.ch*1000000)
+        self.set_fc(2400000000+self.ch*1000000)
         self._ch_slider.set_value(self.ch)
         self._ch_text_box.set_value(self.ch)
 
@@ -256,7 +195,7 @@ class nrf(grc_wxgui.top_block_gui):
         self.rf_gain = rf_gain
         self._rf_gain_slider.set_value(self.rf_gain)
         self._rf_gain_text_box.set_value(self.rf_gain)
-        self.osmosdr_source_0_0.set_gain(self.rf_gain, 0)
+        self.osmosdr_sink_0.set_gain(self.rf_gain, 0)
 
     def get_if_gain(self):
         return self.if_gain
@@ -265,7 +204,7 @@ class nrf(grc_wxgui.top_block_gui):
         self.if_gain = if_gain
         self._if_gain_slider.set_value(self.if_gain)
         self._if_gain_text_box.set_value(self.if_gain)
-        self.osmosdr_source_0_0.set_if_gain(self.if_gain, 0)
+        self.osmosdr_sink_0.set_if_gain(self.if_gain, 0)
 
     def get_fsk_deviation_hz(self):
         return self.fsk_deviation_hz
@@ -273,21 +212,12 @@ class nrf(grc_wxgui.top_block_gui):
     def set_fsk_deviation_hz(self, fsk_deviation_hz):
         self.fsk_deviation_hz = fsk_deviation_hz
 
-    def get_freq_offset(self):
-        return self.freq_offset
-
-    def set_freq_offset(self, freq_offset):
-        self.freq_offset = freq_offset
-        self._freq_offset_slider.set_value(self.freq_offset)
-        self._freq_offset_text_box.set_value(self.freq_offset)
-        self.blocks_add_const_vxx_0.set_k((self.freq_offset, ))
-
     def get_fc(self):
         return self.fc
 
     def set_fc(self, fc):
         self.fc = fc
-        self.osmosdr_source_0_0.set_center_freq(self.fc, 0)
+        self.osmosdr_sink_0.set_center_freq(self.fc, 0)
 
     def get_bw(self):
         return self.bw
@@ -300,7 +230,6 @@ class nrf(grc_wxgui.top_block_gui):
 
     def set_bitrate(self, bitrate):
         self.bitrate = bitrate
-        self.low_pass_filter_0_0.set_taps(firdes.low_pass(1, self.samp_rate, self.bitrate, self.bitrate/2, firdes.WIN_HAMMING, 6.76))
 
     def get_bb_gain(self):
         return self.bb_gain
@@ -309,10 +238,10 @@ class nrf(grc_wxgui.top_block_gui):
         self.bb_gain = bb_gain
         self._bb_gain_slider.set_value(self.bb_gain)
         self._bb_gain_text_box.set_value(self.bb_gain)
-        self.osmosdr_source_0_0.set_bb_gain(self.bb_gain, 0)
+        self.osmosdr_sink_0.set_bb_gain(self.bb_gain, 0)
 
 
-def main(top_block_cls=nrf, options=None):
+def main(top_block_cls=gfsk, options=None):
 
     tb = top_block_cls()
     tb.Start(True)
